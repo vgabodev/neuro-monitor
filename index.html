@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>NeuroEstudo | IF Sertão-PE</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & VARS ============ */
+:root{
+  --bg:#060d1a; --surface:#0e1a2e; --card:#131f35; --card2:#182540;
+  --border:#1e3050; --border2:#263d60;
+  --accent:#00d4ff; --accent2:#7c3aed; --accent3:#f59e0b;
+  --green:#10b981; --red:#ef4444; --orange:#f97316;
+  --text:#e2e8f0; --text2:#94a3b8; --muted:#64748b;
+  --glow:0 0 24px rgba(0,212,255,0.25);
+  --radius:14px; --radius-sm:8px; --radius-xs:6px;
+  --font:'Space Grotesk',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:15px;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(0,212,255,0.06) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(124,58,237,0.06) 0%,transparent 60%);}
+.z1{position:relative;z-index:1;}
+.hidden{display:none!important;}
+
+/* ============ SCREENS ============ */
+.screen{min-height:100vh;display:flex;flex-direction:column;}
+
+/* ============ TYPOGRAPHY ============ */
+.title-xl{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;}
+.title-lg{font-family:'Syne',sans-serif;font-size:clamp(1.4rem,3vw,1.8rem);font-weight:800;}
+.title-md{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;}
+.title-sm{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;}
+.gradient-text{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.text-muted{color:var(--muted);}
+.text-sm{font-size:0.85rem;}
+.text-xs{font-size:0.75rem;}
+
+/* ============ BUTTONS ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 24px;border-radius:var(--radius-sm);border:none;cursor:pointer;
+  font-family:var(--font);font-size:0.9rem;font-weight:600;transition:all 0.2s;
+  text-decoration:none;white-space:nowrap;-webkit-user-select:none;user-select:none;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--glow);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 32px rgba(0,212,255,0.4);}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+.btn-ghost{background:transparent;color:var(--text2);border:none;}
+.btn-ghost:hover{color:var(--text);background:var(--card2);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#dc2626;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#059669;}
+.btn-warning{background:var(--accent3);color:#000;}
+.btn-purple{background:var(--accent2);color:#fff;}
+.btn-lg{padding:15px 32px;font-size:1rem;border-radius:var(--radius);}
+.btn-sm{padding:7px 16px;font-size:0.82rem;border-radius:var(--radius-xs);}
+.btn-xs{padding:4px 10px;font-size:0.73rem;border-radius:5px;}
+.btn-block{width:100%;}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:var(--radius-xs);}
+
+/* ============ FORMS ============ */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:0.83rem;color:var(--text2);margin-bottom:5px;font-weight:500;}
+.form-control{width:100%;padding:11px 14px;background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:0.9rem;
+  transition:border 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none;}
+.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,0.1);}
+textarea.form-control{resize:vertical;min-height:80px;}
+.form-hint{font-size:0.75rem;color:var(--muted);margin-top:4px;}
+.form-err{color:var(--red);font-size:0.8rem;margin-top:6px;display:none;}
+.form-ok{color:var(--green);font-size:0.8rem;margin-top:6px;display:none;}
+.link{color:var(--accent);cursor:pointer;font-size:0.83rem;}
+.link:hover{text-decoration:underline;}
+
+/* ============ AUTH BOX ============ */
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px;}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:clamp(24px,5vw,40px);width:100%;max-width:420px;box-shadow:0 24px 48px rgba(0,0,0,0.4);}
+.auth-logo{font-size:36px;margin-bottom:12px;display:block;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* ============ NAV ============ */
+.nav{background:rgba(13,25,46,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;height:58px;}
+.nav-brand{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;display:flex;align-items:center;gap:8px;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.nav-badge{font-size:0.65rem;background:var(--accent3);color:#000;font-weight:700;
+  padding:2px 7px;border-radius:10px;margin-left:4px;}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#fff;flex-shrink:0;}
+.avatar-lg{width:52px;height:52px;font-size:1.3rem;}
+
+/* ============ CONTENT ============ */
+.content{padding:20px 16px;max-width:1100px;margin:0 auto;width:100%;}
+@media(min-width:640px){.content{padding:24px 24px;}}
+@media(min-width:1024px){.content{padding:28px 32px;}}
+
+/* ============ TABS ============ */
+.tabs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:20px;}
+.tabs-wrap::-webkit-scrollbar{display:none;}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);padding-bottom:0;width:max-content;min-width:100%;}
+.tab{padding:9px 16px;border-radius:8px 8px 0 0;border:none;cursor:pointer;font-size:0.83rem;font-weight:500;
+  background:transparent;color:var(--muted);transition:all 0.2s;font-family:var(--font);white-space:nowrap;border-bottom:2px solid transparent;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(0,212,255,0.05);}
+.tab:hover:not(.active){color:var(--text);background:var(--card2);}
+.tab-badge{display:inline-block;background:var(--red);color:#fff;font-size:0.65rem;
+  font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;}
+
+/* ============ CARDS ============ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-accent{position:relative;overflow:hidden;}
+.card-accent::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));}
+
+/* ============ STATS GRID ============ */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+@media(min-width:480px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:720px){.stats-grid{grid-template-columns:repeat(4,1fr);}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px;text-align:center;transition:transform 0.2s,border-color 0.2s;}
+.stat-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+.stat-icon{font-size:24px;margin-bottom:6px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);}
+.stat-lbl{font-size:0.72rem;color:var(--muted);margin-top:3px;}
+
+/* ============ XP BAR ============ */
+.xp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;}
+.xp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.level-pill{background:linear-gradient(135deg,var(--accent3),var(--orange));color:#000;
+  font-weight:700;padding:3px 11px;border-radius:20px;font-size:0.75rem;}
+.xp-track{background:var(--surface);border-radius:20px;height:10px;overflow:hidden;}
+.xp-fill{background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;border-radius:20px;transition:width 1s ease;}
+.xp-labels{display:flex;justify-content:space-between;margin-top:5px;font-size:0.72rem;color:var(--muted);}
+
+/* ============ QUESTIONNAIRE ============ */
+.q-section{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.q-section:last-child{border-bottom:none;}
+.q-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:6px;}
+.q-title{font-weight:600;font-size:0.95rem;}
+.q-tag{font-size:0.66rem;padding:2px 8px;border-radius:10px;font-weight:600;}
+.q-tag-purple{background:rgba(124,58,237,0.2);color:#a78bfa;}
+.q-tag-gold{background:rgba(245,158,11,0.2);color:var(--accent3);}
+.q-desc{color:var(--muted);font-size:0.8rem;margin-bottom:12px;line-height:1.55;}
+.q-item{margin-bottom:12px;}
+.q-label{font-size:0.88rem;margin-bottom:8px;font-weight:500;line-height:1.4;}
+
+.radio-group{display:flex;flex-wrap:wrap;gap:6px;}
+.r-opt{display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 11px;
+  border:1.5px solid var(--border);border-radius:var(--radius-xs);transition:all 0.18s;font-size:0.82rem;}
+.r-opt:hover{border-color:var(--border2);}
+.r-opt input{accent-color:var(--accent);width:auto;cursor:pointer;}
+.r-opt:has(input:checked){border-color:var(--accent);background:rgba(0,212,255,0.07);color:var(--accent);}
+
+.scale-row{display:flex;gap:6px;flex-wrap:wrap;}
+.scale-btn{width:40px;height:40px;border-radius:var(--radius-xs);border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text);cursor:pointer;font-size:0.88rem;font-weight:600;transition:all 0.18s;}
+.scale-btn:hover{border-color:var(--border2);}
+.scale-btn.sel{background:var(--accent);border-color:var(--accent);color:#000;box-shadow:var(--glow);}
+
+.check-group{display:flex;flex-direction:column;gap:6px;}
+.c-opt{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 11px;
+  border:1.5px solid transparent;border-radius:var(--radius-xs);transition:all 0.18s;font-size:0.85rem;}
+.c-opt:hover{border-color:var(--border);background:var(--surface);}
+.c-opt input{accent-color:var(--accent);width:auto;cursor:pointer;}
+.c-opt:has(input:checked){border-color:var(--accent);background:rgba(0,212,255,0.06);}
+
+.pts-preview{background:var(--surface);border-radius:var(--radius-sm);padding:14px;margin-top:16px;
+  display:flex;align-items:center;gap:14px;border:1px solid var(--border);}
+.pts-big{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--accent3);min-width:50px;}
+
+/* ============ BADGES ============ */
+.badges-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.badge-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:8px 12px;display:flex;align-items:center;gap:7px;transition:all 0.2s;}
+.badge-chip.earned{border-color:var(--accent3);background:rgba(245,158,11,0.07);}
+.badge-chip.locked{opacity:0.3;filter:grayscale(1);}
+.badge-chip .bi{font-size:20px;}
+.badge-chip .bn{font-size:0.78rem;font-weight:600;}
+.badge-chip .bd{font-size:0.68rem;color:var(--muted);}
+
+/* ============ TIP CARD ============ */
+.tip-card{background:linear-gradient(135deg,rgba(0,212,255,0.04),rgba(124,58,237,0.04));
+  border:1px solid rgba(0,212,255,0.18);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.tip-ttl{font-size:0.88rem;font-weight:600;margin-bottom:5px;color:var(--accent);}
+.tip-txt{font-size:0.82rem;color:var(--text2);line-height:1.6;}
+
+/* ============ TABLE ============ */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:500px;}
+thead{background:var(--surface);}
+th{padding:10px 12px;text-align:left;font-size:0.73rem;text-transform:uppercase;letter-spacing:0.5px;
+  color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 12px;font-size:0.84rem;border-bottom:1px solid rgba(30,48,80,0.4);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(0,212,255,0.02);}
+.pill{padding:3px 9px;border-radius:20px;font-size:0.71rem;font-weight:600;white-space:nowrap;display:inline-block;}
+.pill-green{background:rgba(16,185,129,0.15);color:var(--green);}
+.pill-yellow{background:rgba(245,158,11,0.15);color:var(--accent3);}
+.pill-red{background:rgba(239,68,68,0.15);color:var(--red);}
+.pill-blue{background:rgba(0,212,255,0.15);color:var(--accent);}
+.pill-purple{background:rgba(124,58,237,0.15);color:#a78bfa;}
+
+/* ============ CHARTS ============ */
+.chart-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px;}
+@media(min-width:720px){.chart-grid{grid-template-columns:repeat(2,1fr);}}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+.chart-ttl{font-size:0.85rem;font-weight:600;margin-bottom:14px;}
+.chart-box{position:relative;height:190px;}
+
+/* ============ ALERTS ============ */
+.alert{padding:11px 14px;border-radius:var(--radius-sm);margin-bottom:14px;font-size:0.84rem;line-height:1.5;}
+.alert-info{background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);color:var(--accent);}
+.alert-success{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);color:var(--green);}
+.alert-warning{background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);color:var(--accent3);}
+.alert-danger{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);color:var(--red);}
+
+/* ============ MODAL ============ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;
+  display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadein 0.2s ease;}
+@media(min-width:600px){.modal-bg{align-items:center;padding:24px;}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 0 0;
+  padding:24px;width:100%;max-height:90vh;overflow-y:auto;animation:slideup 0.28s ease;}
+@media(min-width:600px){.modal-box{border-radius:20px;max-width:500px;}}
+@keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:4px;margin:0 auto 16px;}
+@media(min-width:600px){.modal-handle{display:none;}}
+.modal-ttl{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;margin-bottom:6px;}
+
+/* ============ HISTORY ============ */
+.hist-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:12px;}
+.hist-pts{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:700;color:var(--accent3);white-space:nowrap;}
+
+/* ============ DUVIDAS ============ */
+.duvida-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px;margin-bottom:10px;}
+.duvida-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.duvida-body{font-size:0.87rem;line-height:1.5;color:var(--text2);}
+.duvida-meta{font-size:0.72rem;color:var(--muted);margin-top:5px;}
+.duvida-resp{background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);
+  border-radius:var(--radius-xs);padding:10px;margin-top:10px;}
+.duvida-resp-lbl{font-size:0.7rem;color:var(--accent);font-weight:600;margin-bottom:4px;}
+.duvida-resp-txt{font-size:0.84rem;color:var(--text);}
+
+/* ============ TURMA CARD ============ */
+.turma-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:border-color 0.2s;}
+.turma-item:hover{border-color:var(--border2);}
+.turma-icon{font-size:24px;flex-shrink:0;}
+
+/* ============ STUDENT DETAIL ============ */
+.profile-row{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+
+/* ============ SECTION HEADER ============ */
+.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.sec-hd-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* ============ FILTER ROW ============ */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.filter-row .form-control{flex:1;min-width:140px;max-width:220px;padding:8px 12px;font-size:0.83rem;}
+
+/* ============ LANDING FEATURES ============ */
+.features{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:40px;}
+.feat{text-align:center;}
+.feat-icon{font-size:26px;margin-bottom:6px;}
+.feat-lbl{font-size:0.75rem;color:var(--muted);}
+
+/* ============ EMPTY STATE ============ */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-icon{font-size:44px;margin-bottom:12px;}
+.empty p{font-size:0.88rem;}
+
+/* ============ PRINT ============ */
+@media print{
+  .nav,.tabs-wrap,button,.btn{display:none!important;}
+  .chart-card{break-inside:avoid;}
+  body{background:#fff;color:#000;}
+}
+</style>
+</head>
+<body>
+<div class="z1">
+
+<!-- ========== LANDING ========== -->
+<div id="s-landing" class="screen">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;">
+    <span class="auth-logo">🧠</span>
+    <h1 class="title-xl gradient-text">NeuroEstudo</h1>
+    <p class="text-muted" style="margin-top:6px;margin-bottom:36px;font-size:0.9rem;max-width:340px;">
+      Instituto Federal do Sertão Pernambucano<br>Campus Santa Maria da Boa Vista
+    </p>
+    <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px;">
+      <button class="btn btn-primary btn-lg btn-block" onclick="go('login')">🎓 Entrar como Aluno</button>
+      <button class="btn btn-outline btn-lg btn-block" onclick="go('register')">✨ Criar minha conta</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:4px" onclick="go('admin-login')">🔐 Acesso Professor</button>
+    </div>
+    <div class="features">
+      <div class="feat"><div class="feat-icon">🏆</div><div class="feat-lbl">Conquistas</div></div>
+      <div class="feat"><div class="feat-icon">⚡</div><div class="feat-lbl">XP & Níveis</div></div>
+      <div class="feat"><div class="feat-icon">💬</div><div class="feat-lbl">Tire Dúvidas</div></div>
+      <div class="feat"><div class="feat-icon">📊</div><div class="feat-lbl">Relatórios</div></div>
+      <div class="feat"><div class="feat-icon">🧬</div><div class="feat-lbl">Neurociência</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== REGISTER ========== -->
+<div id="s-register" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <span style="font-size:28px;margin-bottom:10px;display:block;">🎓</span>
+      <div class="title-md" style="margin-bottom:4px;">Criar Conta</div>
+      <p class="text-sm text-muted" style="margin-bottom:22px;">Comece sua jornada de alto desempenho</p>
+      <div class="form-group"><label class="form-label">Nome completo</label><input class="form-control" id="rg-name" placeholder="Seu nome completo"></div>
+      <div class="form-group"><label class="form-label">Matrícula</label><input class="form-control" id="rg-mat" placeholder="Ex: 2024001"></div>
+      <div class="form-group">
+        <label class="form-label">Turma</label>
+        <select class="form-control" id="rg-turma"><option value="">Selecione sua turma</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Senha</label><input class="form-control" type="password" id="rg-senha" placeholder="Mínimo 6 caracteres"></div>
+      <div class="form-group">
+        <label class="form-label">Pergunta de segurança</label>
+        <select class="form-control" id="rg-perg">
+          <option value="mae">Qual o nome da sua mãe?</option>
+          <option value="cidade">Em que cidade você nasceu?</option>
+          <option value="escola">Nome da sua escola anterior?</option>
+          <option value="animal">Nome do seu animal de estimação?</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Resposta secreta</label><input class="form-control" id="rg-resp" placeholder="Sua resposta"></div>
+      <div class="form-err" id="rg-err"></div>
+      <div class="form-ok" id="rg-ok"></div>
+      <button class="btn btn-primary btn-block" style="margin-top:8px" onclick="doRegister()">Criar conta 🚀</button>
+      <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap;">
+        <span class="link" onclick="go('login')">← Já tenho conta</span>
+        <span class="link" onclick="go('landing')">← Início</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== LOGIN ========== -->
+<div id="s-login" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <span style="font-size:28px;margin-bottom:10px;display:block;">👋</span>
+      <div class="title-md" style="margin-bottom:4px;">Bem-vindo de volta!</div>
+      <p class="text-sm text-muted" style="margin-bottom:22px;">Entre para registrar sua semana</p>
+      <div class="form-group"><label class="form-label">Matrícula</label><input class="form-control" id="lg-mat" placeholder="Sua matrícula"></div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-control" type="password" id="lg-senha" placeholder="Sua senha" onkeydown="if(event.key==='Enter')doLogin()">
+        <span class="link" style="display:block;text-align:right;margin-top:5px;" onclick="go('forgot')">Esqueci minha senha</span>
+      </div>
+      <div class="form-err" id="lg-err"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Entrar ⚡</button>
+      <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap;">
+        <span class="link" onclick="go('register')">← Criar conta</span>
+        <span class="link" onclick="go('landing')">← Início</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FORGOT ========== -->
+<div id="s-forgot" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <span style="font-size:28px;margin-bottom:10px;display:block;">🔑</span>
+      <div class="title-md" style="margin-bottom:4px;">Recuperar Senha</div>
+      <p class="text-sm text-muted" style="margin-bottom:22px;">Responda sua pergunta de segurança</p>
+      <div id="fg-s1">
+        <div class="form-group"><label class="form-label">Matrícula</label><input class="form-control" id="fg-mat" placeholder="Sua matrícula"></div>
+        <div class="form-err" id="fg-err1"></div>
+        <button class="btn btn-primary btn-block" onclick="fgStep1()">Continuar →</button>
+      </div>
+      <div id="fg-s2" class="hidden">
+        <div class="alert alert-info" id="fg-perg-box" style="margin-bottom:12px;"></div>
+        <div class="form-group"><label class="form-label">Sua resposta</label><input class="form-control" id="fg-ans" placeholder="Resposta secreta"></div>
+        <div class="form-group"><label class="form-label">Nova senha</label><input class="form-control" type="password" id="fg-newpass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="form-err" id="fg-err2"></div>
+        <div class="form-ok" id="fg-ok2"></div>
+        <button class="btn btn-primary btn-block" onclick="fgStep2()">Redefinir senha ✅</button>
+      </div>
+      <span class="link" style="display:block;margin-top:14px;" onclick="go('login')">← Voltar ao login</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN LOGIN ========== -->
+<div id="s-admin-login" class="screen hidden">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <span style="font-size:28px;margin-bottom:10px;display:block;">🔐</span>
+      <div class="title-md" style="margin-bottom:4px;">Acesso Professor</div>
+      <p class="text-sm text-muted" style="margin-bottom:22px;">Núcleo Pedagógico</p>
+      <div class="form-group"><label class="form-label">Código de acesso</label><input class="form-control" type="password" id="adm-code" placeholder="Código do professor" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+      <div class="form-err" id="adm-err"></div>
+      <button class="btn btn-primary btn-block" onclick="doAdminLogin()">Acessar Painel 📊</button>
+      <span class="link" style="display:block;margin-top:14px;" onclick="go('landing')">← Início</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== STUDENT ========== -->
+<div id="s-student" class="screen hidden">
+  <nav class="nav">
+    <div class="nav-brand gradient-text">🧠 NeuroEstudo</div>
+    <div class="nav-right">
+      <div class="avatar" id="st-av"></div>
+      <span class="text-sm text-muted" id="st-name" style="display:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
+    </div>
+  </nav>
+  <div class="content">
+    <div class="tabs-wrap">
+      <div class="tabs">
+        <button class="tab active" onclick="stTab('home',this)">🏠 Início</button>
+        <button class="tab" onclick="stTab('quest',this)">📋 Questionário</button>
+        <button class="tab" onclick="stTab('history',this)">📈 Histórico</button>
+        <button class="tab" onclick="stTab('duvidas',this)" id="tab-duvidas">💬 Dúvidas</button>
+        <button class="tab" onclick="stTab('learn',this)">📚 Aprender</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="st-home">
+      <div class="title-lg">Olá, <span id="st-greet"></span>! 👋</div>
+      <p class="text-sm text-muted" style="margin:4px 0 20px;">Protocolo das 7 Estratégias Neurocognitivas</p>
+      <div class="xp-card">
+        <div class="xp-header">
+          <div><span style="font-weight:700;" id="lv-name">Iniciante</span> <span class="text-xs text-muted" id="lv-xp">0 XP</span></div>
+          <span class="level-pill" id="lv-badge">Nv. 1</span>
+        </div>
+        <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+        <div class="xp-labels"><span>0</span><span id="xp-next">100 XP para Nv. 2</span></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-val" id="s-xp">0</div><div class="stat-lbl">XP Total</div></div>
+        <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val" id="s-str">0</div><div class="stat-lbl">Semanas seguidas</div></div>
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-val" id="s-sub">0</div><div class="stat-lbl">Fichas enviadas</div></div>
+        <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-val" id="s-avg">-</div><div class="stat-lbl">Média de pontos</div></div>
+      </div>
+      <div class="title-sm" style="margin-bottom:10px;">🏅 Suas Conquistas</div>
+      <div class="badges-grid" id="badges-grid"></div>
+      <div style="margin-top:22px;">
+        <div class="title-sm" style="margin-bottom:10px;">💡 Dica do Dia</div>
+        <div id="tip-day"></div>
+      </div>
+    </div>
+
+    <!-- QUEST -->
+    <div id="st-quest" class="hidden">
+      <div class="title-lg">📋 Ficha Semanal</div>
+      <p class="text-sm text-muted" id="qwk-lbl" style="margin:4px 0 20px;">Registre suas atividades desta semana</p>
+      <div id="q-done" class="hidden">
+        <div class="alert alert-success">✅ Você já enviou a ficha desta semana! Volte na próxima semana para manter sua sequência 🔥</div>
+        <button class="btn btn-outline btn-sm" onclick="stTab('history',null)">Ver meu histórico →</button>
+      </div>
+      <div id="q-form" class="card card-accent">
+        <div class="title-sm" style="margin-bottom:4px;">Protocolo das 7 Estratégias</div>
+        <p class="text-xs text-muted" style="margin-bottom:20px;">Responda com honestidade — cada ponto representa seu progresso real</p>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">🎯 Planejamento & Recompensa</span><span class="q-tag q-tag-purple">Estratégias 1 e 2</span><span class="q-tag q-tag-gold">20 pts</span></div>
+          <p class="q-desc">Antecipar recompensas ativa a dopamina e aumenta motivação em até 40%. A dopamina é liberada na antecipação, não na recompensa.</p>
+          <div class="q-item"><div class="q-label">1. Você definiu antecipadamente o que ia estudar esta semana?</div><div class="scale-row" id="q1"></div></div>
+          <div class="q-item"><div class="q-label">2. Você se prometeu uma recompensa ao terminar o estudo?</div><div class="scale-row" id="q2"></div></div>
+          <div class="q-item"><div class="q-label">3. Como foi seu nível de motivação para estudar esta semana?</div><div class="scale-row" id="q3"></div></div>
+          <div class="q-item">
+            <div class="q-label">4. Você cumpriu o que havia planejado estudar?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q4" value="0"><span>Não estudei</span></label>
+              <label class="r-opt"><input type="radio" name="q4" value="1"><span>Menos de 30%</span></label>
+              <label class="r-opt"><input type="radio" name="q4" value="2"><span>30% a 60%</span></label>
+              <label class="r-opt"><input type="radio" name="q4" value="4"><span>60% a 90%</span></label>
+              <label class="r-opt"><input type="radio" name="q4" value="5"><span>Tudo que planejei ✅</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">🏠 Ritual & Ambiente</span><span class="q-tag q-tag-purple">Estratégias 3 e 6</span><span class="q-tag q-tag-gold">20 pts</span></div>
+          <p class="q-desc">Preparar o ambiente reduz a carga cognitiva automaticamente. Seu cérebro aprende por associação — mesmo local, mesmo ritual = foco mais rápido.</p>
+          <div class="q-item">
+            <div class="q-label">5. Você preparou seu ambiente de estudo (silêncio, organização, celular afastado)?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q5" value="0"><span>Não me preocupei</span></label>
+              <label class="r-opt"><input type="radio" name="q5" value="3"><span>Às vezes</span></label>
+              <label class="r-opt"><input type="radio" name="q5" value="5"><span>Sempre preparei</span></label>
+            </div>
+          </div>
+          <div class="q-item">
+            <div class="q-label">6. Você usou ritual de aquecimento mental antes de estudar? (respiração, revisão rápida...)</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q6" value="0"><span>Não usei</span></label>
+              <label class="r-opt"><input type="radio" name="q6" value="3"><span>Em alguns dias</span></label>
+              <label class="r-opt"><input type="radio" name="q6" value="5"><span>Todo dia</span></label>
+            </div>
+          </div>
+          <div class="q-item">
+            <div class="q-label">7. Quanto tempo conseguiu ficar sem distrações durante os estudos?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q7" value="0"><span>Não consegui</span></label>
+              <label class="r-opt"><input type="radio" name="q7" value="2"><span>Menos de 20 min</span></label>
+              <label class="r-opt"><input type="radio" name="q7" value="3"><span>20 a 40 min</span></label>
+              <label class="r-opt"><input type="radio" name="q7" value="5"><span>Mais de 40 min</span></label>
+            </div>
+          </div>
+          <div class="q-item">
+            <div class="q-label">8. Qual foi sua maior distração? (marque todos que se aplicam)</div>
+            <div class="check-group" id="q8">
+              <label class="c-opt"><input type="checkbox" value="celular"><span>📱 Celular / redes sociais</span></label>
+              <label class="c-opt"><input type="checkbox" value="familia"><span>👨‍👩‍👧 Pessoas ao redor</span></label>
+              <label class="c-opt"><input type="checkbox" value="sono"><span>😴 Sono / cansaço</span></label>
+              <label class="c-opt"><input type="checkbox" value="ansiedade"><span>😰 Ansiedade / pensamentos</span></label>
+              <label class="c-opt"><input type="checkbox" value="nenhuma"><span>✅ Consegui evitar distrações</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">⏱️ Janelas de Foco</span><span class="q-tag q-tag-purple">Estratégia 4</span><span class="q-tag q-tag-gold">30 pts</span></div>
+          <p class="q-desc">Blocos de 40 minutos de imersão total seguem os ciclos ultradianos do cérebro. Cada janela completa = 10 pontos. Máximo 3 janelas por semana.</p>
+          <div class="q-item">
+            <div class="q-label">9. Quantas janelas de foco (40 min sem interrupção) você completou esta semana?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q9" value="0"><span>Nenhuma</span></label>
+              <label class="r-opt"><input type="radio" name="q9" value="10"><span>1 janela</span></label>
+              <label class="r-opt"><input type="radio" name="q9" value="20"><span>2 janelas</span></label>
+              <label class="r-opt"><input type="radio" name="q9" value="30"><span>3+ janelas 🔥</span></label>
+            </div>
+          </div>
+          <div class="q-item">
+            <div class="q-label">10. Em qual horário você se concentra melhor?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q10" value="manha"><span>🌅 Manhã</span></label>
+              <label class="r-opt"><input type="radio" name="q10" value="tarde"><span>🌤️ Tarde</span></label>
+              <label class="r-opt"><input type="radio" name="q10" value="noite"><span>🌙 Noite</span></label>
+              <label class="r-opt"><input type="radio" name="q10" value="madrugada"><span>🌃 Madrugada</span></label>
+            </div>
+          </div>
+          <div class="q-item"><div class="q-label">11. Qual matéria recebeu mais foco esta semana?</div><input class="form-control" id="q11" placeholder="Ex: Matemática, Física..."></div>
+        </div>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">🔄 Recuperação Ativa</span><span class="q-tag q-tag-purple">Estratégia 5</span><span class="q-tag q-tag-gold">20 pts</span></div>
+          <p class="q-desc">Testar a memória sem olhar o material é 2x mais eficaz que reler. O cérebro fortalece sinapses quando precisa recuperar informação ativamente.</p>
+          <div class="q-item">
+            <div class="q-label">12. Quais técnicas de recuperação ativa você usou?</div>
+            <div class="check-group" id="q12">
+              <label class="c-opt"><input type="checkbox" value="expliquei"><span>🗣️ Expliquei o conteúdo (para alguém ou no espelho)</span></label>
+              <label class="c-opt"><input type="checkbox" value="questoes"><span>📝 Respondi questões sem ver o material</span></label>
+              <label class="c-opt"><input type="checkbox" value="video"><span>🎥 Gravei vídeo explicando os conceitos</span></label>
+              <label class="c-opt"><input type="checkbox" value="flashcard"><span>🃏 Usei flashcards ou quizzes</span></label>
+              <label class="c-opt"><input type="checkbox" value="resumo"><span>✍️ Fiz resumo de memória (sem copiar)</span></label>
+              <label class="c-opt"><input type="checkbox" value="nenhuma"><span>❌ Não usei (só reli)</span></label>
+            </div>
+          </div>
+          <div class="q-item"><div class="q-label">13. Após estudar, você lembrava os pontos principais sem consultar?</div><div class="scale-row" id="q13"></div></div>
+        </div>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">💚 Mentalidade & Bem-estar</span><span class="q-tag q-tag-purple">Estratégia 7</span><span class="q-tag q-tag-gold">10 pts</span></div>
+          <p class="q-desc">Cortisol elevado bloqueia a formação de memórias no hipocampo. Cuidar da mente é tão científico quanto qualquer outra estratégia de estudo.</p>
+          <div class="q-item"><div class="q-label">14. Como foi seu estado emocional geral nesta semana?</div><div class="scale-row" id="q14"></div></div>
+          <div class="q-item">
+            <div class="q-label">15. Você usou alguma técnica para acalmar quando travou?</div>
+            <div class="radio-group">
+              <label class="r-opt"><input type="radio" name="q15" value="0"><span>Não usei</span></label>
+              <label class="r-opt"><input type="radio" name="q15" value="2"><span>Pausa simples</span></label>
+              <label class="r-opt"><input type="radio" name="q15" value="3"><span>Respiração / alongamento</span></label>
+              <label class="r-opt"><input type="radio" name="q15" value="5"><span>Afirmações + pausa estruturada</span></label>
+            </div>
+          </div>
+          <div class="q-item"><div class="q-label">16. Qual frase usou para se motivar? (opcional)</div><input class="form-control" id="q16" placeholder="Ex: 'Cada sessão me aproxima do meu objetivo'"></div>
+          <div class="q-item"><div class="q-label">17. Como avalia sua semana de estudos no geral?</div><div class="scale-row" id="q17"></div></div>
+        </div>
+
+        <div class="q-section">
+          <div class="q-head"><span class="q-title">💭 Reflexão Final</span></div>
+          <div class="q-item"><div class="q-label">18. Qual foi seu maior obstáculo esta semana?</div><textarea class="form-control" id="q18" placeholder="Descreva brevemente..."></textarea></div>
+          <div class="q-item"><div class="q-label">19. O que fará diferente na próxima semana?</div><textarea class="form-control" id="q19" placeholder="Seu comprometimento..."></textarea></div>
+        </div>
+
+        <div class="pts-preview">
+          <div class="pts-big" id="live-pts">0</div>
+          <div style="flex:1;">
+            <div style="background:var(--border);border-radius:20px;height:7px;overflow:hidden;margin-bottom:5px;">
+              <div id="pts-bar" style="height:100%;background:linear-gradient(90deg,var(--accent3),var(--orange));border-radius:20px;width:0%;transition:width 0.3s;"></div>
+            </div>
+            <div class="text-xs text-muted" id="pts-fb">Responda as perguntas para calcular seus pontos</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:20px;font-size:1rem;padding:15px;" onclick="submitQuest()">🚀 Enviar Ficha Semanal</button>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="st-history" class="hidden">
+      <div class="title-lg">📈 Meu Histórico</div>
+      <p class="text-sm text-muted" style="margin:4px 0 20px;">Acompanhe sua evolução semana a semana</p>
+      <div class="chart-card" style="margin-bottom:16px;"><div class="chart-ttl">Pontuação semanal</div><div class="chart-box"><canvas id="st-chart"></canvas></div></div>
+      <div id="hist-list"></div>
+    </div>
+
+    <!-- DÚVIDAS -->
+    <div id="st-duvidas" class="hidden">
+      <div class="title-lg">💬 Minhas Dúvidas</div>
+      <p class="text-sm text-muted" style="margin:4px 0 20px;">Envie perguntas — o professor responde diretamente aqui</p>
+      <div class="card">
+        <div class="title-sm" style="margin-bottom:14px;">➕ Nova dúvida</div>
+        <div class="form-group">
+          <label class="form-label">Matéria</label>
+          <select class="form-control" id="dv-mat">
+            <option>Matemática</option><option>Física</option><option>Química</option>
+            <option>Português</option><option>História</option><option>Geografia</option>
+            <option>Biologia</option><option>Inglês</option><option>Informática</option>
+            <option>Disciplina Técnica</option><option>Outro</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Sua dúvida</label><textarea class="form-control" id="dv-txt" placeholder="Descreva sua dúvida com detalhes..."></textarea></div>
+        <div class="form-ok" id="dv-ok"></div>
+        <button class="btn btn-primary btn-sm" onclick="sendDuvida()">Enviar dúvida 📤</button>
+      </div>
+      <div class="title-sm" style="margin-bottom:10px;">📩 Histórico</div>
+      <div id="dv-list"></div>
+    </div>
+
+    <!-- LEARN -->
+    <div id="st-learn" class="hidden">
+      <div class="title-lg">📚 Aprenda a Estudar</div>
+      <p class="text-sm text-muted" style="margin:4px 0 20px;">As 7 estratégias baseadas em neurociência aplicada à educação</p>
+      <div id="learn-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN ========== -->
+<div id="s-admin" class="screen hidden">
+  <nav class="nav">
+    <div class="nav-brand gradient-text">🧠 NeuroEstudo <span class="nav-badge">PROFESSOR</span></div>
+    <div class="nav-right">
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Sair</button>
+    </div>
+  </nav>
+  <div style="background:linear-gradient(135deg,var(--surface),var(--card));border-bottom:1px solid var(--border);padding:16px 20px;">
+    <div class="title-lg" style="margin:0;">Painel Pedagógico</div>
+    <p class="text-xs text-muted" style="margin-top:3px;">Campus Santa Maria da Boa Vista · Protocolo Neurocognitivo 2026</p>
+    <div class="tabs-wrap" style="margin-top:14px;margin-bottom:0;">
+      <div class="tabs">
+        <button class="tab active" onclick="adTab('overview',this)">📊 Visão Geral</button>
+        <button class="tab" onclick="adTab('students',this)">👥 Alunos</button>
+        <button class="tab" onclick="adTab('turmas',this)">🏫 Turmas</button>
+        <button class="tab" onclick="adTab('responses',this)">📋 Respostas</button>
+        <button class="tab" onclick="adTab('duvidas',this)" id="adm-tab-dv">💬 Dúvidas</button>
+        <button class="tab" onclick="adTab('charts',this)">📈 Gráficos</button>
+        <button class="tab" onclick="adTab('export',this)">⬇️ Exportar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div id="ad-overview">
+      <div class="stats-grid" id="adm-stats" style="grid-template-columns:repeat(2,1fr);"></div>
+      <div class="chart-grid" id="adm-ov-charts"></div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="ad-students" class="hidden">
+      <div class="sec-hd">
+        <div class="title-sm">👥 Alunos Cadastrados</div>
+        <button class="btn btn-danger btn-sm" onclick="showDeleteAllModal()">🗑️ Gerenciar</button>
+      </div>
+      <div class="filter-row">
+        <input class="form-control" id="f-aluno" placeholder="🔍 Buscar aluno ou matrícula..." oninput="renderStudents()" style="flex:2;">
+        <select class="form-control" id="f-turma-s" onchange="renderStudents()"><option value="">Todas as turmas</option></select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Aluno</th><th>Matrícula</th><th>Turma</th><th>XP</th>
+            <th>Fichas</th><th>Streak</th><th>Último envio</th><th>Semana atual</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="st-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TURMAS -->
+    <div id="ad-turmas" class="hidden">
+      <div class="sec-hd">
+        <div class="title-sm">🏫 Gerenciar Turmas</div>
+        <button class="btn btn-primary btn-sm" onclick="showAddTurma()">+ Nova turma</button>
+      </div>
+      <div id="turmas-list"></div>
+    </div>
+
+    <!-- RESPONSES -->
+    <div id="ad-responses" class="hidden">
+      <div class="sec-hd">
+        <div class="title-sm">📋 Respostas Semanais</div>
+      </div>
+      <div class="filter-row">
+        <select class="form-control" id="f-turma-r" onchange="renderResponses()"><option value="">Todas as turmas</option></select>
+        <select class="form-control" id="f-week-r" onchange="renderResponses()"><option value="">Todas as semanas</option></select>
+        <input class="form-control" id="f-nome-r" placeholder="🔍 Buscar aluno..." oninput="renderResponses()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Aluno</th><th>Turma</th><th>Semana</th><th>Data</th>
+            <th>Planej.</th><th>Ambiente</th><th>Foco</th><th>Rec.Ativa</th><th>Bem-estar</th>
+            <th>Total</th><th>Classificação</th><th>Ação</th>
+          </tr></thead>
+          <tbody id="resp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DÚVIDAS ADMIN -->
+    <div id="ad-duvidas" class="hidden">
+      <div class="sec-hd">
+        <div class="title-sm">💬 Dúvidas dos Alunos</div>
+        <div class="filter-row" style="margin:0;">
+          <select class="form-control" id="f-dv-status" onchange="renderAdminDuvidas()" style="width:auto;">
+            <option value="">Todas</option>
+            <option value="pending">Sem resposta</option>
+            <option value="answered">Respondidas</option>
+          </select>
+        </div>
+      </div>
+      <div id="adm-dv-list"></div>
+    </div>
+
+    <!-- CHARTS -->
+    <div id="ad-charts" class="hidden">
+      <div class="chart-grid" id="adm-charts-wrap"></div>
+    </div>
+
+    <!-- EXPORT -->
+    <div id="ad-export" class="hidden">
+      <div class="title-sm" style="margin-bottom:16px;">⬇️ Exportar Dados</div>
+      <div class="chart-grid">
+        <div class="card"><div class="title-sm" style="margin-bottom:6px;">👥 Tabela de Alunos</div><p class="text-xs text-muted" style="margin-bottom:14px;">XP, streak, fichas enviadas e status semanal</p><button class="btn btn-success btn-sm" onclick="exportCSV('students')">⬇️ Download CSV</button></div>
+        <div class="card"><div class="title-sm" style="margin-bottom:6px;">📋 Todas as Respostas</div><p class="text-xs text-muted" style="margin-bottom:14px;">Fichas semanais com pontuações detalhadas por categoria</p><button class="btn btn-success btn-sm" onclick="exportCSV('responses')">⬇️ Download CSV</button></div>
+        <div class="card"><div class="title-sm" style="margin-bottom:6px;">📊 Relatório Mensal</div><p class="text-xs text-muted" style="margin-bottom:14px;">Resumo estatístico por semana para o Departamento</p><button class="btn btn-warning btn-sm" onclick="exportCSV('monthly')">⬇️ Download CSV</button></div>
+        <div class="card"><div class="title-sm" style="margin-bottom:6px;">💬 Dúvidas Exportadas</div><p class="text-xs text-muted" style="margin-bottom:14px;">Todas as dúvidas e respostas dos alunos</p><button class="btn btn-purple btn-sm" onclick="exportCSV('duvidas')">⬇️ Download CSV</button></div>
+        <div class="card"><div class="title-sm" style="margin-bottom:6px;">🖨️ Imprimir Relatório</div><p class="text-xs text-muted" style="margin-bottom:14px;">Dashboard completo em PDF via impressão do navegador</p><button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Imprimir / PDF</button></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /admin screen -->
+
+<!-- ========== MODALS ========== -->
+<!-- Success -->
+<div id="m-success" class="modal-bg hidden">
+  <div class="modal-box" style="text-align:center;">
+    <div class="modal-handle"></div>
+    <div style="font-size:56px;margin-bottom:12px;" id="m-icon">🎉</div>
+    <div class="modal-ttl" id="m-title">Ficha enviada!</div>
+    <p class="text-sm text-muted" id="m-desc" style="margin-bottom:16px;"></p>
+    <div style="background:var(--surface);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;color:var(--accent3);" id="m-pts">0</div>
+      <div class="text-xs text-muted">pontos conquistados esta semana</div>
+    </div>
+    <div id="m-badge" class="hidden" style="background:rgba(245,158,11,0.08);border:1px solid var(--accent3);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;">
+      <div style="font-size:2rem;" id="m-badge-icon"></div>
+      <div style="font-weight:600;font-size:0.88rem;margin-top:4px;" id="m-badge-name"></div>
+      <div class="text-xs text-muted" id="m-badge-desc"></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="closeModal('m-success')">Continuar 🚀</button>
+  </div>
+</div>
+
+<!-- Confirm delete student -->
+<div id="m-del-student" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-ttl">⚠️ Excluir Aluno</div>
+    <p class="text-sm text-muted" id="m-del-name" style="margin:8px 0 16px;"></p>
+    <div class="alert alert-danger">Esta ação é permanente e excluirá também todas as fichas e dúvidas do aluno.</div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal('m-del-student')">Cancelar</button>
+      <button class="btn btn-danger btn-block" onclick="confirmDeleteStudent()">Excluir definitivamente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add turma -->
+<div id="m-add-turma" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-ttl">🏫 Nova Turma</div>
+    <div class="form-group" style="margin-top:14px;"><label class="form-label">Nome da turma</label><input class="form-control" id="nt-nome" placeholder="Ex: 2° Ano - Informática"></div>
+    <div class="form-err" id="nt-err"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal('m-add-turma')">Cancelar</button>
+      <button class="btn btn-primary btn-block" onclick="confirmAddTurma()">Criar turma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit turma -->
+<div id="m-edit-turma" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-ttl">✏️ Editar Turma</div>
+    <div class="form-group" style="margin-top:14px;"><label class="form-label">Novo nome</label><input class="form-control" id="et-nome" placeholder="Nome da turma"></div>
+    <div class="form-err" id="et-err"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal('m-edit-turma')">Cancelar</button>
+      <button class="btn btn-primary btn-block" onclick="confirmEditTurma()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete turma -->
+<div id="m-del-turma" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-ttl">⚠️ Excluir Turma</div>
+    <p class="text-sm text-muted" id="m-del-turma-name" style="margin:8px 0 14px;"></p>
+    <div class="alert alert-warning">Alunos cadastrados nesta turma ficarão sem turma atribuída.</div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal('m-del-turma')">Cancelar</button>
+      <button class="btn btn-danger btn-block" onclick="confirmDelTurma()">Excluir turma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student detail -->
+<div id="m-student-detail" class="modal-bg hidden">
+  <div class="modal-box" style="max-width:600px;text-align:left;">
+    <div class="modal-handle"></div>
+    <div id="m-st-detail-content"></div>
+    <button class="btn btn-outline btn-block" style="margin-top:12px;" onclick="closeModal('m-student-detail')">Fechar</button>
+  </div>
+</div>
+
+<!-- Response detail -->
+<div id="m-resp-detail" class="modal-bg hidden">
+  <div class="modal-box" style="max-width:600px;text-align:left;">
+    <div class="modal-handle"></div>
+    <div id="m-resp-content"></div>
+    <button class="btn btn-outline btn-block" style="margin-top:12px;" onclick="closeModal('m-resp-detail')">Fechar</button>
+  </div>
+</div>
+
+<!-- Reply duvida -->
+<div id="m-reply" class="modal-bg hidden">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-ttl">💬 Responder Dúvida</div>
+    <p class="text-xs text-muted" id="m-reply-q" style="margin:8px 0 14px;background:var(--surface);padding:10px;border-radius:var(--radius-xs);"></p>
+    <div class="form-group"><label class="form-label">Sua resposta</label><textarea class="form-control" id="m-reply-txt" placeholder="Escreva a resposta para o aluno..." rows="4"></textarea></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal('m-reply')">Cancelar</button>
+      <button class="btn btn-primary btn-block" onclick="confirmReply()">Enviar resposta 📤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  FIREBASE CONFIG
+// ============================================================
+const FB_URL = 'https://neuroestudo-24a26-default-rtdb.firebaseio.com';
+
+async function fbGet(path) {
+  try {
+    const r = await fetch(`${FB_URL}/${path}.json`);
+    return await r.json();
+  } catch(e) { return null; }
+}
+async function fbSet(path, data) {
+  try {
+    await fetch(`${FB_URL}/${path}.json`, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.error('fbSet error', e); }
+}
+async function fbPush(path, data) {
+  try {
+    const r = await fetch(`${FB_URL}/${path}.json`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    return await r.json();
+  } catch(e) { return null; }
+}
+async function fbUpdate(path, data) {
+  try {
+    await fetch(`${FB_URL}/${path}.json`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.error('fbUpdate error', e); }
+}
+async function fbDelete(path) {
+  try {
+    await fetch(`${FB_URL}/${path}.json`, { method: 'DELETE' });
+  } catch(e) { console.error('fbDelete error', e); }
+}
+
+// ============================================================
+//  IN-MEMORY CACHE (evita chamadas repetidas)
+// ============================================================
+const CACHE = { users: null, responses: null, turmas: null, duvidas: null };
+const DEFAULT_TURMAS = ['1° Ano - Informática','2° Ano - Informática','3° Ano - Informática','1° Ano - Agropecuária','2° Ano - Agropecuária','3° Ano - Agropecuária','1° Ano - Edificações','2° Ano - Edificações','3° Ano - Edificações'];
+
+const DB = {
+  users: () => CACHE.users || {},
+  setUsers: async (u) => { CACHE.users = u; await fbSet('users', u); },
+  responses: () => CACHE.responses || [],
+  setResp: async (r) => { CACHE.responses = r; await fbSet('responses', r); },
+  turmas: () => CACHE.turmas || DEFAULT_TURMAS,
+  setTurmas: async (t) => { CACHE.turmas = t; await fbSet('turmas', t); },
+  duvidas: () => CACHE.duvidas || [],
+  setDuvidas: async (d) => { CACHE.duvidas = d; await fbSet('duvidas', d); },
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+let CU = null;
+let isAdm = false;
+let delTarget = null;
+let editTurmaOld = null;
+let delTurmaTarget = null;
+let replyTarget = null;
+let stChartInst = null;
+let admCharts = {};
+
+// ============================================================
+//  NAV
+// ============================================================
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.add('hidden'));
+  document.getElementById('s-'+s).classList.remove('hidden');
+  window.scrollTo(0,0);
+  if(s==='register') populateTurmaSelects();
+}
+function doLogout(){ CU=null; isAdm=false; go('landing'); }
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+// loading overlay
+function showLoading(msg='Carregando...'){
+  let o=el('global-loader');
+  if(!o){ o=document.createElement('div'); o.id='global-loader';
+    o.style.cssText='position:fixed;inset:0;background:rgba(6,13,26,0.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;';
+    o.innerHTML=`<div style="width:40px;height:40px;border:3px solid #1e3050;border-top-color:#00d4ff;border-radius:50%;animation:spin 0.8s linear infinite;"></div><div style="color:#94a3b8;font-size:0.9rem;">${msg}</div>`;
+    document.body.appendChild(o); }
+  else o.querySelector('div:last-child').textContent=msg;
+  o.style.display='flex';
+}
+function hideLoading(){ const o=el('global-loader'); if(o) o.style.display='none'; }
+
+// ============================================================
+//  INIT — carregar dados do Firebase na memória
+// ============================================================
+async function initApp(){
+  showLoading('Conectando ao banco de dados...');
+  try {
+    const [users, responses, turmas, duvidas] = await Promise.all([
+      fbGet('users'), fbGet('responses'), fbGet('turmas'), fbGet('duvidas')
+    ]);
+    CACHE.users    = users    || {};
+    CACHE.responses= Array.isArray(responses) ? responses : (responses ? Object.values(responses) : []);
+    CACHE.turmas   = Array.isArray(turmas) ? turmas : DEFAULT_TURMAS;
+    CACHE.duvidas  = Array.isArray(duvidas) ? duvidas : (duvidas ? Object.values(duvidas) : []);
+    // seed turmas se vazio
+    if(!CACHE.turmas.length){ CACHE.turmas=DEFAULT_TURMAS; await fbSet('turmas',DEFAULT_TURMAS); }
+  } catch(e) {
+    console.error('Erro ao carregar Firebase:', e);
+  }
+  hideLoading();
+  populateTurmaSelects();
+}
+
+// ============================================================
+//  AUTH
+// ============================================================
+async function doRegister(){
+  const name=v('rg-name'), mat=v('rg-mat'), turma=v('rg-turma'),
+        senha=v('rg-senha'), perg=v('rg-perg'), resp=v('rg-resp');
+  const err=el('rg-err'), ok=el('rg-ok');
+  err.style.display='none'; ok.style.display='none';
+  if(!name||!mat||!turma||!senha||!resp){ showErr(err,'Preencha todos os campos.'); return; }
+  if(senha.length<6){ showErr(err,'Senha precisa ter ao menos 6 caracteres.'); return; }
+  const users=DB.users();
+  if(users[mat]){ showErr(err,'Matrícula já cadastrada.'); return; }
+  showLoading('Criando conta...');
+  users[mat]={name,matricula:mat,turma,senha,perg,resp:resp.toLowerCase().trim(),xp:0,streak:0,lastWeek:null,badges:[],createdAt:now()};
+  await DB.setUsers(users);
+  hideLoading();
+  ok.textContent='✅ Conta criada! Entrando...'; ok.style.display='block';
+  setTimeout(()=>{ CU=users[mat]; loadStudent(); go('student'); },800);
+}
+
+async function doLogin(){
+  const mat=v('lg-mat'), senha=v('lg-senha'); const err=el('lg-err');
+  err.style.display='none';
+  showLoading('Verificando...');
+  // refresh users from Firebase to ensure latest
+  const fresh = await fbGet('users');
+  if(fresh) CACHE.users = fresh;
+  hideLoading();
+  const users=DB.users();
+  if(!users[mat]||users[mat].senha!==senha){ showErr(err,'Matrícula ou senha incorretos.'); return; }
+  CU=users[mat]; loadStudent(); go('student');
+}
+
+async function doAdminLogin(){
+  const code=v('adm-code'); const err=el('adm-err'); err.style.display='none';
+  if(code!=='NEURO2026'){ showErr(err,'Código incorreto.'); return; }
+  showLoading('Carregando painel...');
+  // Refresh all data
+  const [users,responses,turmas,duvidas]=await Promise.all([fbGet('users'),fbGet('responses'),fbGet('turmas'),fbGet('duvidas')]);
+  CACHE.users=users||{};
+  CACHE.responses=Array.isArray(responses)?responses:(responses?Object.values(responses):[]);
+  CACHE.turmas=Array.isArray(turmas)?turmas:DEFAULT_TURMAS;
+  CACHE.duvidas=Array.isArray(duvidas)?duvidas:(duvidas?Object.values(duvidas):[]);
+  hideLoading();
+  isAdm=true; loadAdmin(); go('admin');
+}
+
+async function fgStep1(){
+  const mat=v('fg-mat'); const err=el('fg-err1'); err.style.display='none';
+  showLoading('Buscando conta...');
+  const fresh=await fbGet('users'); if(fresh) CACHE.users=fresh;
+  hideLoading();
+  const users=DB.users();
+  if(!users[mat]){ showErr(err,'Matrícula não encontrada.'); return; }
+  const pergs={mae:'Qual o nome da sua mãe?',cidade:'Em que cidade você nasceu?',escola:'Nome da sua escola anterior?',animal:'Nome do seu animal de estimação?'};
+  el('fg-perg-box').textContent='🔒 '+pergs[users[mat].perg];
+  el('fg-s1').classList.add('hidden'); el('fg-s2').classList.remove('hidden');
+}
+async function fgStep2(){
+  const mat=v('fg-mat'), ans=v('fg-ans').toLowerCase().trim(), np=v('fg-newpass');
+  const err=el('fg-err2'), ok=el('fg-ok2'); err.style.display='none'; ok.style.display='none';
+  const users=DB.users();
+  if(!users[mat]){ showErr(err,'Erro. Volte ao passo anterior.'); return; }
+  if(users[mat].resp!==ans){ showErr(err,'Resposta incorreta.'); return; }
+  if(np.length<6){ showErr(err,'Nova senha deve ter ao menos 6 caracteres.'); return; }
+  showLoading('Salvando...');
+  users[mat].senha=np; await DB.setUsers(users);
+  hideLoading();
+  ok.textContent='✅ Senha redefinida! Faça login.'; ok.style.display='block';
+  setTimeout(()=>go('login'),1500);
+}
+
+// ============================================================
+//  STUDENT
+// ============================================================
+async function loadStudent(){
+  // Refresh user from Firebase
+  const fresh=await fbGet(`users/${CU.matricula}`);
+  if(fresh) { CACHE.users[CU.matricula]=fresh; CU=fresh; }
+  el('st-av').textContent=CU.name[0].toUpperCase();
+  el('st-name').textContent=CU.name.split(' ')[0];
+  el('st-name').style.display='';
+  el('st-greet').textContent=CU.name.split(' ')[0];
+  updateXP(); updateStats(); renderBadges(); renderTip();
+  buildScales();
+  checkWeek();
+  updateDuvidaBadge();
+}
+
+async function stTab(t,btn){
+  ['home','quest','history','duvidas','learn'].forEach(x=>el('st-'+x).classList.add('hidden'));
+  el('st-'+t).classList.remove('hidden');
+  if(btn){ document.querySelectorAll('#s-student .tab').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); }
+  if(t==='history') await renderHistory();
+  if(t==='duvidas'){ await renderDuvidas(); updateDuvidaBadge(); }
+  if(t==='learn') renderLearn();
+}
+
+// XP
+function getLvl(xp){
+  const lvs=[{n:'Iniciante',m:0},{n:'Explorador',m:100},{n:'Dedicado',m:250},{n:'Focado',m:500},{n:'Estrategista',m:850},{n:'Mestre Mental',m:1300},{n:'Neurocientista',m:2000}];
+  let i=0; for(;i<lvs.length-1;i++) if(xp<lvs[i+1].m) break;
+  const cur=lvs[i], next=lvs[i+1];
+  const pct=next?((xp-cur.m)/(next.m-cur.m)*100):100;
+  return {lv:i+1,name:cur.n,pct:Math.min(pct,100),toNext:next?next.m-xp:0,nextName:next?.n};
+}
+function updateXP(){
+  const xp=CU.xp||0, info=getLvl(xp);
+  el('lv-name').textContent=info.name; el('lv-xp').textContent=xp+' XP';
+  el('lv-badge').textContent='Nv. '+info.lv;
+  el('xp-fill').style.width=info.pct+'%';
+  el('xp-next').textContent=info.toNext?info.toNext+' XP para '+info.nextName:'Nível máximo! 🏆';
+}
+function updateStats(){
+  const res=DB.responses().filter(r=>r.mat===CU.matricula);
+  const avg=res.length?Math.round(res.reduce((a,b)=>a+b.total,0)/res.length):'-';
+  el('s-xp').textContent=CU.xp||0; el('s-str').textContent=CU.streak||0;
+  el('s-sub').textContent=res.length; el('s-avg').textContent=avg;
+}
+
+// Badges
+function allBadges(){return[
+  {id:'b1',icon:'🎯',n:'Primeira Missão',d:'Enviou sua primeira ficha',chk:(u,all)=>all.length>=1},
+  {id:'b2',icon:'🔥',n:'Em Chamas',d:'3 semanas seguidas',chk:(u)=>(u.streak||0)>=3},
+  {id:'b3',icon:'⚡',n:'Imparável',d:'7 semanas seguidas',chk:(u)=>(u.streak||0)>=7},
+  {id:'b4',icon:'💯',n:'Pontuação Máxima',d:'100 pontos em uma semana',chk:(u,all,r)=>r&&r.total>=100},
+  {id:'b5',icon:'🌟',n:'Estrela',d:'80+ pontos em uma semana',chk:(u,all,r)=>r&&r.total>=80},
+  {id:'b6',icon:'🧘',n:'Mestre do Foco',d:'3 janelas de foco em uma semana',chk:(u,all,r)=>r&&r.sec3>=30},
+  {id:'b7',icon:'🔄',n:'Recuperador',d:'3+ técnicas de rec. ativa',chk:(u,all,r)=>r&&r.recAtiva.filter(x=>x!=='nenhuma').length>=3},
+  {id:'b8',icon:'💎',n:'Meio Caminho',d:'500 XP acumulados',chk:(u)=>(u.xp||0)>=500},
+  {id:'b9',icon:'👑',n:'Lenda do Sertão',d:'1000 XP acumulados',chk:(u)=>(u.xp||0)>=1000},
+];}
+function renderBadges(){
+  const earned=CU.badges||[];
+  el('badges-grid').innerHTML=allBadges().map(b=>`
+    <div class="badge-chip ${earned.includes(b.id)?'earned':'locked'}">
+      <span class="bi">${b.icon}</span>
+      <div><div class="bn">${b.n}</div><div class="bd">${b.d}</div></div>
+    </div>`).join('');
+}
+
+// Tip
+const TIPS=[
+  {t:'🧠 Efeito de Espaçamento',d:'Estudar um pouco todo dia é até 200% mais eficaz do que estudar muito em um único dia. Seu cérebro consolida memórias durante o sono — distribua seus estudos!'},
+  {t:'🔄 Recuperação Ativa',d:'Tentar lembrar o conteúdo sem olhar o material fortalece as conexões neurais 2x mais do que reler. Feche o caderno e tente explicar o que sabe!'},
+  {t:'⏱️ Ciclos Ultradianos',d:'Seu cérebro funciona em ciclos de 90 minutos. Dentro desse ciclo, 40-50 minutos de foco intenso seguidos de 10 min de pausa é o padrão ótimo.'},
+  {t:'😴 Sono e Memória',d:'Durante o sono profundo, o hipocampo transfere memórias para o córtex. Dormir menos de 7h reduz a retenção em até 40%!'},
+  {t:'🎯 Efeito de Geração',d:'Gerar respostas (mesmo erradas) antes de ver a solução correta melhora muito a aprendizagem. Tente resolver antes de ver o gabarito.'},
+  {t:'💧 Hidratação e Cognição',d:'Apenas 1-2% de desidratação já reduz a capacidade de concentração. Mantenha uma garrafa d\'água ao lado enquanto estuda.'},
+  {t:'✍️ Escrever à Mão',d:'Fazer resumos à mão ativa áreas mais profundas do cérebro ligadas à compreensão e não apenas à memória mecânica.'},
+  {t:'🎵 Ambiente Sonoro',d:'Sons de natureza ou música instrumental sem letra podem melhorar o foco sem distrair a parte verbal do cérebro.'},
+];
+function renderTip(){
+  const tip=TIPS[new Date().getDate()%TIPS.length];
+  el('tip-day').innerHTML=`<div class="tip-ttl">${tip.t}</div><div class="tip-txt">${tip.d}</div>`;
+}
+
+// ============================================================
+//  QUESTIONNAIRE
+// ============================================================
+function buildScales(){
+  const scaleDefs={
+    q1:[1,5,'Nunca,Raramente,Às vezes,Frequentemente,Sempre'],
+    q2:[1,5,'Nunca,Raramente,Às vezes,Frequentemente,Sempre'],
+    q3:[1,5,'Desmotivado,Pouco motivado,Regular,Motivado,Muito motivado'],
+    q13:[1,5,'Nada,Pouco,Regular,Bastante,Quase tudo'],
+    q14:[1,5,'Muito estressado,Estressado,Neutro,Bem,Ótimo'],
+    q17:[1,5,'Muito ruim,Ruim,Regular,Boa,Excelente'],
+  };
+  Object.entries(scaleDefs).forEach(([id,[mn,mx,lbs]])=>{
+    const c=document.getElementById(id); if(!c) return;
+    const lblArr=lbs.split(',');
+    c.innerHTML='';
+    for(let i=mn;i<=mx;i++){
+      const b=document.createElement('button');
+      b.className='scale-btn'; b.type='button'; b.textContent=i;
+      b.title=lblArr[i-mn]||''; b.dataset.val=i; b.dataset.grp=id;
+      b.onclick=function(){
+        document.querySelectorAll(`.scale-btn[data-grp="${id}"]`).forEach(x=>x.classList.remove('sel'));
+        this.classList.add('sel'); calcPts();
+      };
+      c.appendChild(b);
+    }
+  });
+  document.querySelectorAll('#q-form input[type=radio],#q-form input[type=checkbox]').forEach(x=>x.addEventListener('change',calcPts));
+}
+
+function getWeekKey(){
+  const d=new Date(), jan1=new Date(d.getFullYear(),0,1);
+  const wk=Math.ceil(((d-jan1)/86400000+jan1.getDay()+1)/7);
+  return `${d.getFullYear()}-S${String(wk).padStart(2,'0')}`;
+}
+async function checkWeek(){
+  const wk=getWeekKey();
+  // Refresh responses
+  const fresh=await fbGet('responses');
+  if(fresh) CACHE.responses=Array.isArray(fresh)?fresh:Object.values(fresh);
+  const done=DB.responses().some(r=>r.mat===CU.matricula&&r.weekKey===wk);
+  el('q-done').classList.toggle('hidden',!done);
+  el('q-form').classList.toggle('hidden',done);
+  el('qwk-lbl').textContent=`Semana ${wk} · Registre suas atividades`;
+}
+
+function scaleVal(id){ const s=document.querySelector(`.scale-btn[data-grp="${id}"].sel`); return s?+s.dataset.val:0; }
+function radioVal(n){ const s=document.querySelector(`input[name="${n}"]:checked`); return s?+s.value:0; }
+function checkboxVals(id){ return [...document.querySelectorAll(`#${id} input:checked`)].map(x=>x.value); }
+
+function calcPts(){
+  const s1q1=scaleVal('q1'),s1q2=scaleVal('q2'),s1q3=scaleVal('q3'),s1q4=radioVal('q4');
+  const sec1=Math.min(20,Math.round((s1q1+s1q2+s1q3)/15*10+s1q4));
+  const s2q5=radioVal('q5'),s2q6=radioVal('q6'),s2q7=radioVal('q7');
+  const q8v=checkboxVals('q8'); const noDistr=q8v.includes('nenhuma')?5:0;
+  const sec2=Math.min(20,Math.round(s2q5+s2q6+s2q7+noDistr));
+  const sec3=Math.min(30,radioVal('q9'));
+  const q12v=checkboxVals('q12'); const noRecAtiva=q12v.includes('nenhuma');
+  const s4q13=scaleVal('q13');
+  const sec4=Math.min(20,Math.round((noRecAtiva?0:q12v.filter(x=>x!=='nenhuma').length*3)+s4q13));
+  const s5q14=scaleVal('q14'),s5q15=radioVal('q15'),s5q17=scaleVal('q17');
+  const sec5=Math.min(10,Math.round((s5q14+s5q15+s5q17)/15*10));
+  const total=sec1+sec2+sec3+sec4+sec5;
+  el('live-pts').textContent=total;
+  el('pts-bar').style.width=total+'%';
+  const fb=['Continue respondendo... 📝','Bom início! Continue...','Você está indo bem! 💪','Ótimo desempenho! 🔥','Semana excelente! 🏆'];
+  el('pts-fb').textContent=fb[Math.min(Math.floor(total/25),4)];
+  return {total,sec1,sec2,sec3,sec4,sec5};
+}
+
+async function submitQuest(){
+  const pts=calcPts();
+  if(pts.total===0){ alert('Responda pelo menos algumas perguntas antes de enviar!'); return; }
+  const wk=getWeekKey();
+  showLoading('Verificando...');
+  const freshResp=await fbGet('responses');
+  if(freshResp) CACHE.responses=Array.isArray(freshResp)?freshResp:Object.values(freshResp);
+  if(DB.responses().some(r=>r.mat===CU.matricula&&r.weekKey===wk)){ hideLoading(); alert('Você já enviou a ficha esta semana!'); return; }
+  const q12v=checkboxVals('q12');
+  const entry={
+    id:Date.now(),mat:CU.matricula,name:CU.name,turma:CU.turma,weekKey:wk,
+    date:new Date().toLocaleDateString('pt-BR'),datetime:new Date().toISOString(),
+    sec1:pts.sec1,sec2:pts.sec2,sec3:pts.sec3,sec4:pts.sec4,sec5:pts.sec5,total:pts.total,
+    q10:document.querySelector('input[name="q10"]:checked')?.value||'-',
+    q11:v('q11')||'-', q16:v('q16')||'-', q18:v('q18')||'-', q19:v('q19')||'-',
+    distractions:checkboxVals('q8'), recAtiva:q12v,
+  };
+  showLoading('Salvando ficha...');
+  const resp=DB.responses(); resp.push(entry);
+  await DB.setResp(resp);
+  const users=DB.users(); const u=users[CU.matricula];
+  u.xp=(u.xp||0)+pts.total; u.streak=(u.streak||0)+1; u.lastWeek=wk;
+  if(!u.badges) u.badges=[];
+  let newBadge=null;
+  const userResp=resp.filter(r=>r.mat===CU.matricula);
+  allBadges().forEach(b=>{ if(!u.badges.includes(b.id)&&b.chk(u,userResp,entry)){ u.badges.push(b.id); if(!newBadge) newBadge=b; } });
+  await DB.setUsers(users); CU=u;
+  hideLoading();
+  const ic=pts.total>=80?'🏆':pts.total>=60?'🔥':'✅';
+  const tt=pts.total>=80?'Semana épica!':pts.total>=60?'Ótima semana!':'Bom trabalho!';
+  el('m-icon').textContent=ic; el('m-title').textContent=tt;
+  el('m-desc').textContent=`+${pts.total} XP adicionados ao seu perfil!`;
+  el('m-pts').textContent=pts.total;
+  if(newBadge){ el('m-badge').classList.remove('hidden'); el('m-badge-icon').textContent=newBadge.icon; el('m-badge-name').textContent='🏅 Nova conquista: '+newBadge.n; el('m-badge-desc').textContent=newBadge.d; }
+  else el('m-badge').classList.add('hidden');
+  openModal('m-success');
+  checkWeek(); updateXP(); updateStats(); renderBadges();
+}
+
+// ============================================================
+//  HISTORY
+// ============================================================
+async function renderHistory(){
+  showLoading('Carregando histórico...');
+  const freshResp=await fbGet('responses');
+  if(freshResp) CACHE.responses=Array.isArray(freshResp)?freshResp:Object.values(freshResp);
+  hideLoading();
+  const resp=DB.responses().filter(r=>r.mat===CU.matricula).sort((a,b)=>b.id-a.id);
+  const list=el('hist-list');
+  if(!resp.length){ list.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><p>Nenhuma ficha enviada ainda. Vá para "Questionário" para começar!</p></div>`; return; }
+  list.innerHTML=resp.map(r=>`
+    <div class="hist-item">
+      <div>
+        <div style="font-weight:600;font-size:0.88rem;">${r.weekKey}</div>
+        <div class="text-xs text-muted">${r.date} · P:${r.sec1} A:${r.sec2} F:${r.sec3} R:${r.sec4} B:${r.sec5}</div>
+      </div>
+      <div class="hist-pts">${r.total} pts</div>
+    </div>`).join('');
+  const sorted=[...resp].reverse();
+  const ctx=el('st-chart').getContext('2d');
+  if(stChartInst) stChartInst.destroy();
+  stChartInst=new Chart(ctx,{
+    type:'line',
+    data:{labels:sorted.map(r=>r.weekKey.split('-')[1]),datasets:[{label:'Pontos',data:sorted.map(r=>r.total),borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,0.08)',tension:0.4,fill:true,pointBackgroundColor:'#00d4ff',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{min:0,max:100,grid:{color:'#1e3050'},ticks:{color:'#64748b',font:{size:10}}},x:{grid:{color:'#1e3050'},ticks:{color:'#64748b',font:{size:10}}}}}
+  });
+}
+
+// ============================================================
+//  DÚVIDAS STUDENT
+// ============================================================
+async function sendDuvida(){
+  const mat=v('dv-mat'), txt=v('dv-txt'); const ok=el('dv-ok');
+  if(!txt.trim()){ alert('Escreva sua dúvida antes de enviar.'); return; }
+  const dvs=DB.duvidas();
+  dvs.push({id:Date.now(),mat:CU.matricula,name:CU.name,turma:CU.turma,
+    materia:mat,texto:txt,date:new Date().toLocaleDateString('pt-BR'),datetime:new Date().toISOString(),
+    status:'pending',resposta:null,respDate:null});
+  DB.setDuvidas(dvs);
+  el('dv-txt').value='';
+  ok.textContent='✅ Dúvida enviada! O professor responderá em breve.'; ok.style.display='block';
+  setTimeout(()=>{ ok.style.display='none'; },3000);
+  await renderDuvidas(); updateDuvidaBadge();
+}
+
+async function renderDuvidas(){
+  const fresh=await fbGet('duvidas');
+  if(fresh) CACHE.duvidas=Array.isArray(fresh)?fresh:Object.values(fresh);
+  const dvs=DB.duvidas().filter(d=>d.mat===CU.matricula).sort((a,b)=>b.id-a.id);
+  const list=el('dv-list');
+  if(!dvs.length){ list.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><p>Nenhuma dúvida enviada ainda.</p></div>`; return; }
+  list.innerHTML=dvs.map(d=>`
+    <div class="duvida-card">
+      <div class="duvida-head">
+        <span class="pill pill-purple">${d.materia}</span>
+        <span class="pill ${d.status==='answered'?'pill-green':'pill-yellow'}">${d.status==='answered'?'✅ Respondida':'⏳ Aguardando'}</span>
+      </div>
+      <div class="duvida-body">${esc(d.texto)}</div>
+      <div class="duvida-meta">Enviada em ${d.date}</div>
+      ${d.resposta?`<div class="duvida-resp"><div class="duvida-resp-lbl">💬 Resposta do Professor · ${d.respDate}</div><div class="duvida-resp-txt">${esc(d.resposta)}</div></div>`:''}
+    </div>`).join('');
+}
+
+function updateDuvidaBadge(){
+  const count=DB.duvidas().filter(d=>d.mat===CU?.matricula&&d.status==='answered').length;
+  const tab=el('tab-duvidas'); if(!tab) return;
+  const existing=tab.querySelector('.tab-badge'); if(existing) existing.remove();
+  if(count>0){ const b=document.createElement('span'); b.className='tab-badge'; b.textContent=count; tab.appendChild(b); }
+}
+
+// ============================================================
+//  LEARN
+// ============================================================
+function renderLearn(){
+  const strats=[
+    {n:1,icon:'🎯',t:'Antecipação de Recompensa',sub:'Gestão dopaminérgica',c:'#00d4ff',
+      body:'A dopamina não é liberada quando você recebe a recompensa — ela é liberada quando você <strong>antecipa</strong> recebê-la. Antes de cada sessão, defina explicitamente o que vai estudar E qual recompensa você se dará ao terminar. Isso cria um estado motivacional que sustenta o esforço.',
+      tips:['Defina a recompensa ANTES de começar','Seja específico: "Vou estudar por 40 min, depois assistirei 1 episódio"','Cumpra sempre — seu cérebro precisa confiar em você']},
+    {n:2,icon:'📋',t:'Planejamento de Carga',sub:'Evitando paralisia decisória',c:'#7c3aed',
+      body:'Quando você não sabe por onde começar, o cérebro entra em modo de ameaça e procrastina. Reserve 5 minutos na noite anterior para listar os 3 tópicos mais importantes do dia seguinte.',
+      tips:['Lista de no máximo 3 itens por sessão','Priorize pelo critério: "O que está mais próximo da prova?"','Quebre temas grandes em subtópicos específicos']},
+    {n:3,icon:'🔔',t:'Rituais de Transição',sub:'Âncoras sensoriais para foco',c:'#10b981',
+      body:'O cérebro aprende por associação. Se você sempre fizer a mesma sequência antes de estudar, essas ações se tornam um gatilho automático para o estado de foco.',
+      tips:['Exemplo: Água → Fones → Celular no silencioso → Timer de 40 min','Repita o mesmo ritual SEMPRE','Em 2-3 semanas o foco vem automaticamente']},
+    {n:4,icon:'⏱️',t:'Janelas de Foco Ultradiano',sub:'Ciclos biológicos de 40 minutos',c:'#f59e0b',
+      body:'Seu cérebro alterna entre estados de alta e baixa ativação em ciclos ultradianos. Dentro de cada ciclo existe uma janela de ~40 minutos de pico cognitivo.',
+      tips:['40 min foco total → 10 min pausa total','Durante a pausa: levante, caminhe, sem celular','No máximo 3 janelas por sessão']},
+    {n:5,icon:'🔄',t:'Recuperação Ativa',sub:'O método mais poderoso da ciência',c:'#ef4444',
+      body:'Reler cria uma ilusão de competência — você reconhece mas não consegue reproduzir. A recuperação ativa é 2x mais eficaz e detecta exatamente o que você ainda não sabe.',
+      tips:['Feche o livro → escreva tudo que lembra','Explique como se fosse ensinar alguém','Responda questões ANTES de ver o gabarito']},
+    {n:6,icon:'🏠',t:'Arquitetura de Ambiente',sub:'Controle de estímulos',c:'#06b6d4',
+      body:'Um celular na mesa — mesmo desligado — reduz a capacidade cognitiva disponível porque parte do cérebro fica monitorando notificações.',
+      tips:['Celular em outro cômodo (não só na mesa)','Estude sempre no mesmo local — cria associação mental','Use apps de bloqueio: Forest, Freedom, Cold Turkey']},
+    {n:7,icon:'💚',t:'Afirmação de Competência',sub:'Mentalidade de crescimento',c:'#8b5cf6',
+      body:'Estresse crônico libera cortisol, que literalmente bloqueia a formação de memórias no hipocampo. Alunos com mentalidade de crescimento mantêm o cortisol baixo e aprendem mais.',
+      tips:["Troque 'Não consigo' por 'Ainda não consigo — mas vou aprender'",'Quando travar: respire 4 tempos, expire 6 tempos','Celebre progressos pequenos — não só resultados finais']},
+  ];
+  el('learn-content').innerHTML=strats.map(s=>`
+    <div class="tip-card" style="border-color:${s.c}33;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="font-size:24px;">${s.icon}</span>
+        <div><div style="font-weight:700;font-size:0.92rem;color:${s.c};">Estratégia ${s.n}: ${s.t}</div><div class="text-xs text-muted">${s.sub}</div></div>
+      </div>
+      <p style="font-size:0.84rem;color:var(--text2);line-height:1.65;margin-bottom:10px;">${s.body}</p>
+      <div class="text-xs text-muted" style="font-weight:600;margin-bottom:4px;">Como aplicar:</div>
+      ${s.tips.map(t=>`<div style="font-size:0.8rem;color:var(--text2);padding:3px 0 3px 12px;position:relative;"><span style="position:absolute;left:0;color:${s.c};">→</span>${t}</div>`).join('')}
+    </div>`).join('');
+}
+
+// ============================================================
+//  ADMIN
+// ============================================================
+function loadAdmin(){ adTab('overview',null); }
+
+async function adTab(t,btn){
+  ['overview','students','turmas','responses','duvidas','charts','export'].forEach(x=>el('ad-'+x).classList.add('hidden'));
+  el('ad-'+t).classList.remove('hidden');
+  if(btn){ document.querySelectorAll('#s-admin .tab').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); }
+  // Always refresh from Firebase when switching tabs
+  showLoading('Atualizando...');
+  const [users,responses,turmas,duvidas]=await Promise.all([fbGet('users'),fbGet('responses'),fbGet('turmas'),fbGet('duvidas')]);
+  CACHE.users=users||{};
+  CACHE.responses=Array.isArray(responses)?responses:(responses?Object.values(responses):[]);
+  CACHE.turmas=Array.isArray(turmas)?turmas:DEFAULT_TURMAS;
+  CACHE.duvidas=Array.isArray(duvidas)?duvidas:(duvidas?Object.values(duvidas):[]);
+  hideLoading();
+  if(t==='overview') renderOverview();
+  if(t==='students') renderStudents();
+  if(t==='turmas') renderTurmas();
+  if(t==='responses') renderResponses();
+  if(t==='duvidas') renderAdminDuvidas();
+  if(t==='charts') renderCharts();
+}
+
+// ---- OVERVIEW ----
+function renderOverview(){
+  const users=Object.values(DB.users()), resp=DB.responses(), dvs=DB.duvidas();
+  const wk=getWeekKey(), thisWk=resp.filter(r=>r.weekKey===wk);
+  const avg=resp.length?Math.round(resp.reduce((a,b)=>a+b.total,0)/resp.length):0;
+  const pendDv=dvs.filter(d=>d.status==='pending').length;
+  el('adm-stats').innerHTML=[
+    ['👥','Alunos',users.length],['📋','Fichas totais',resp.length],
+    ['📅','Esta semana',thisWk.length],['⭐','Pontuação média',avg],
+    ['🔥','Fichas 80+ pts',resp.filter(r=>r.total>=80).length],['💬','Dúvidas pendentes',pendDv],
+  ].map(([ic,lb,val])=>`<div class="stat-card"><div class="stat-icon">${ic}</div><div class="stat-val">${val}</div><div class="stat-lbl">${lb}</div></div>`).join('');
+  el('adm-ov-charts').innerHTML=`
+    <div class="chart-card"><div class="chart-ttl">📈 Evolução Semanal (Média)</div><div class="chart-box"><canvas id="ov-c1"></canvas></div></div>
+    <div class="chart-card"><div class="chart-ttl">🎯 Desempenho por Categoria</div><div class="chart-box"><canvas id="ov-c2"></canvas></div></div>`;
+  setTimeout(()=>{
+    const wkMap={};
+    resp.forEach(r=>{ if(!wkMap[r.weekKey]) wkMap[r.weekKey]=[]; wkMap[r.weekKey].push(r.total); });
+    const wks=Object.keys(wkMap).sort();
+    mkChart('ov-c1','line',{labels:wks.map(w=>w.split('-')[1]),datasets:[{label:'Média',data:wks.map(w=>Math.round(wkMap[w].reduce((a,b)=>a+b,0)/wkMap[w].length)),borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,0.08)',tension:0.4,fill:true}]});
+    const catAvgs=['sec1','sec2','sec3','sec4','sec5'].map((k,i)=>{
+      const mx=[20,20,30,20,10][i]; const vals=resp.map(r=>r[k]);
+      return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length/mx*100):0;
+    });
+    mkChart('ov-c2','radar',{labels:['Planejamento','Ambiente','Foco','Rec.Ativa','Bem-estar'],datasets:[{label:'%',data:catAvgs,backgroundColor:'rgba(124,58,237,0.15)',borderColor:'#7c3aed',pointBackgroundColor:'#7c3aed'}]},{scales:{r:{min:0,max:100,grid:{color:'#1e3050'},ticks:{display:false},pointLabels:{color:'#94a3b8',font:{size:10}}}}});
+  },80);
+}
+
+// ---- STUDENTS ----
+function populateTurmaSelects(){
+  const turmas=DB.turmas();
+  ['rg-turma','f-turma-s','f-turma-r'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const hasAll=id!=='rg-turma';
+    const cur=sel.value;
+    sel.innerHTML=(hasAll?'<option value="">Todas as turmas</option>':'')+turmas.map(t=>`<option value="${t}">${t}</option>`).join('');
+    if(cur) sel.value=cur;
+  });
+}
+
+function renderStudents(){
+  populateTurmaSelects();
+  const users=Object.values(DB.users()), resp=DB.responses(), wk=getWeekKey();
+  const q=(v('f-aluno')||'').toLowerCase(), tf=v('f-turma-s')||'';
+  const filtered=users.filter(u=>{
+    const match=(u.name.toLowerCase().includes(q)||u.matricula.includes(q));
+    const turmaOk=!tf||u.turma===tf;
+    return match&&turmaOk;
+  });
+  el('st-tbody').innerHTML=filtered.length?filtered.map(u=>{
+    const ur=resp.filter(r=>r.mat===u.matricula);
+    const last=ur[ur.length-1];
+    const sentWk=ur.some(r=>r.weekKey===wk);
+    return`<tr>
+      <td><strong>${esc(u.name)}</strong></td>
+      <td class="text-xs text-muted">${u.matricula}</td>
+      <td class="text-xs">${esc(u.turma||'-')}</td>
+      <td><strong style="color:var(--accent3);">${u.xp||0}</strong></td>
+      <td>${ur.length}</td>
+      <td>🔥 ${u.streak||0}</td>
+      <td class="text-xs">${last?last.date:'-'}</td>
+      <td><span class="pill ${sentWk?'pill-green':'pill-red'}">${sentWk?'✓ Enviou':'✗ Pendente'}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-xs" onclick="showStudentDetail('${u.matricula}')">👁️</button>
+          <button class="btn btn-danger btn-xs" onclick="showDeleteStudent('${u.matricula}','${esc(u.name)}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:32px;">Nenhum aluno encontrado.</td></tr>`;
+}
+
+function showDeleteStudent(mat,name){
+  delTarget=mat;
+  el('m-del-name').textContent=`Aluno: ${name} (${mat})`;
+  openModal('m-del-student');
+}
+async function confirmDeleteStudent(){
+  if(!delTarget) return;
+  showLoading('Excluindo aluno...');
+  const users=DB.users(); delete users[delTarget]; await DB.setUsers(users);
+  const resp=DB.responses().filter(r=>r.mat!==delTarget); await DB.setResp(resp);
+  const dvs=DB.duvidas().filter(d=>d.mat!==delTarget); await DB.setDuvidas(dvs);
+  hideLoading();
+  closeModal('m-del-student'); delTarget=null; renderStudents();
+}
+
+function showStudentDetail(mat){
+  const users=DB.users(), u=users[mat]; if(!u) return;
+  const resp=DB.responses().filter(r=>r.mat===mat).sort((a,b)=>b.id-a.id);
+  const avg=resp.length?Math.round(resp.reduce((a,b)=>a+b.total,0)/resp.length):'-';
+  const info=getLvl(u.xp||0);
+  el('m-st-detail-content').innerHTML=`
+    <div class="profile-row">
+      <div class="avatar avatar-lg">${u.name[0]}</div>
+      <div>
+        <div class="title-sm">${esc(u.name)}</div>
+        <div class="text-xs text-muted">${u.matricula} · ${esc(u.turma||'-')}</div>
+        <div style="margin-top:4px;"><span class="level-pill">Nv. ${info.lv} — ${info.name}</span></div>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-val">${u.xp||0}</div><div class="stat-lbl">XP Total</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val">${u.streak||0}</div><div class="stat-lbl">Streak</div></div>
+      <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-val">${resp.length}</div><div class="stat-lbl">Fichas</div></div>
+      <div class="stat-card"><div class="stat-icon">🎯</div><div class="stat-val">${avg}</div><div class="stat-lbl">Média</div></div>
+    </div>
+    <div class="title-sm" style="margin-bottom:8px;">Últimas fichas</div>
+    ${resp.slice(0,5).map(r=>`<div class="hist-item"><div><div style="font-size:0.85rem;font-weight:600;">${r.weekKey}</div><div class="text-xs text-muted">${r.date}</div></div><div class="hist-pts">${r.total} pts</div></div>`).join('')||'<p class="text-xs text-muted">Nenhuma ficha enviada.</p>'}`;
+  openModal('m-student-detail');
+}
+
+function showDeleteAllModal(){
+  // Simple toggle — show manage panel inline
+  alert('Use o filtro para encontrar o aluno e clique em 🗑️ para excluí-lo.');
+}
+
+// ---- TURMAS ----
+function renderTurmas(){
+  const turmas=DB.turmas(), users=Object.values(DB.users());
+  el('turmas-list').innerHTML=turmas.length?turmas.map(t=>{
+    const count=users.filter(u=>u.turma===t).length;
+    return`<div class="turma-item">
+      <span class="turma-icon">🏫</span>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:0.9rem;">${esc(t)}</div>
+        <div class="text-xs text-muted">${count} aluno${count!==1?'s':''}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-xs" onclick="showEditTurma('${esc(t)}')">✏️ Editar</button>
+        <button class="btn btn-danger btn-xs" onclick="showDelTurma('${esc(t)}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join(''):`<div class="empty"><div class="empty-icon">🏫</div><p>Nenhuma turma criada. Clique em "+ Nova turma".</p></div>`;
+}
+function showAddTurma(){ el('nt-nome').value=''; el('nt-err').style.display='none'; openModal('m-add-turma'); }
+async function confirmAddTurma(){
+  const nome=v('nt-nome').trim(); const err=el('nt-err');
+  if(!nome){ showErr(err,'Digite o nome da turma.'); return; }
+  const turmas=DB.turmas();
+  if(turmas.includes(nome)){ showErr(err,'Turma já existe.'); return; }
+  turmas.push(nome); await DB.setTurmas(turmas);
+  closeModal('m-add-turma'); renderTurmas(); populateTurmaSelects();
+}
+function showEditTurma(old){ editTurmaOld=old; el('et-nome').value=old; el('et-err').style.display='none'; openModal('m-edit-turma'); }
+async function confirmEditTurma(){
+  const nome=v('et-nome').trim(); const err=el('et-err');
+  if(!nome){ showErr(err,'Digite o nome da turma.'); return; }
+  const turmas=DB.turmas();
+  const idx=turmas.indexOf(editTurmaOld); if(idx<0){ showErr(err,'Turma não encontrada.'); return; }
+  turmas[idx]=nome; await DB.setTurmas(turmas);
+  const users=DB.users();
+  Object.values(users).forEach(u=>{ if(u.turma===editTurmaOld) u.turma=nome; }); await DB.setUsers(users);
+  closeModal('m-edit-turma'); renderTurmas(); populateTurmaSelects();
+}
+function showDelTurma(t){ delTurmaTarget=t; el('m-del-turma-name').textContent=`Turma: ${t}`; openModal('m-del-turma'); }
+async function confirmDelTurma(){
+  if(!delTurmaTarget) return;
+  const turmas=DB.turmas().filter(t=>t!==delTurmaTarget); await DB.setTurmas(turmas);
+  closeModal('m-del-turma'); delTurmaTarget=null; renderTurmas(); populateTurmaSelects();
+}
+
+// ---- RESPONSES ----
+function renderResponses(){
+  populateTurmaSelects();
+  const resp=DB.responses();
+  const wks=[...new Set(resp.map(r=>r.weekKey))].sort().reverse();
+  const fw=el('f-week-r'); const curWk=fw.value;
+  fw.innerHTML='<option value="">Todas as semanas</option>'+wks.map(w=>`<option value="${w}">${w}</option>`).join('');
+  if(curWk) fw.value=curWk;
+  const tf=v('f-turma-r')||'', wf=v('f-week-r')||'', nf=(v('f-nome-r')||'').toLowerCase();
+  const filtered=resp.filter(r=>(!tf||r.turma===tf)&&(!wf||r.weekKey===wf)&&(!nf||r.name.toLowerCase().includes(nf))).sort((a,b)=>b.id-a.id);
+  el('resp-tbody').innerHTML=filtered.length?filtered.map(r=>{
+    const cls=r.total>=80?'pill-green':r.total>=50?'pill-yellow':'pill-red';
+    const lb=r.total>=80?'Excelente':r.total>=50?'Regular':'Atenção';
+    return`<tr>
+      <td><strong>${esc(r.name)}</strong></td>
+      <td class="text-xs">${esc(r.turma)}</td>
+      <td class="text-xs">${r.weekKey}</td>
+      <td class="text-xs">${r.date}</td>
+      <td>${r.sec1}/20</td><td>${r.sec2}/20</td><td>${r.sec3}/30</td><td>${r.sec4}/20</td><td>${r.sec5}/10</td>
+      <td><strong style="color:var(--accent3);">${r.total}</strong></td>
+      <td><span class="pill ${cls}">${lb}</span></td>
+      <td><button class="btn btn-outline btn-xs" onclick="showRespDetail(${r.id})">👁️</button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="12" style="text-align:center;color:var(--muted);padding:32px;">Nenhuma resposta encontrada.</td></tr>`;
+}
+
+function showRespDetail(id){
+  const r=DB.responses().find(x=>x.id===id); if(!r) return;
+  el('m-resp-content').innerHTML=`
+    <div class="title-sm" style="margin-bottom:12px;">📋 Ficha de ${esc(r.name)}</div>
+    <div class="text-xs text-muted" style="margin-bottom:14px;">${r.weekKey} · ${r.date} · ${esc(r.turma)}</div>
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px;">
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;">${r.sec1}/20</div><div class="stat-lbl">Planejamento</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;">${r.sec2}/20</div><div class="stat-lbl">Ambiente</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;">${r.sec3}/30</div><div class="stat-lbl">Foco</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;">${r.sec4}/20</div><div class="stat-lbl">Rec.Ativa</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;">${r.sec5}/10</div><div class="stat-lbl">Bem-estar</div></div>
+      <div class="stat-card"><div class="stat-val" style="font-size:1.2rem;color:var(--accent3);">${r.total}</div><div class="stat-lbl">Total</div></div>
+    </div>
+    <div style="display:grid;gap:8px;font-size:0.84rem;">
+      <div><strong>Matéria:</strong> ${esc(r.q11)}</div>
+      <div><strong>Horário de foco:</strong> ${r.q10}</div>
+      <div><strong>Distrações:</strong> ${(r.distractions||[]).join(', ')||'-'}</div>
+      <div><strong>Recuperação ativa:</strong> ${(r.recAtiva||[]).join(', ')||'-'}</div>
+      <div><strong>Obstáculo:</strong> ${esc(r.q18)||'-'}</div>
+      <div><strong>Próxima semana:</strong> ${esc(r.q19)||'-'}</div>
+      <div><strong>Frase motivadora:</strong> ${esc(r.q16)||'-'}</div>
+    </div>`;
+  openModal('m-resp-detail');
+}
+
+// ---- DÚVIDAS ADMIN ----
+function renderAdminDuvidas(){
+  const sf=v('f-dv-status')||'';
+  let dvs=DB.duvidas().sort((a,b)=>b.id-a.id);
+  if(sf==='pending') dvs=dvs.filter(d=>d.status==='pending');
+  if(sf==='answered') dvs=dvs.filter(d=>d.status==='answered');
+  // update tab badge
+  const pend=DB.duvidas().filter(d=>d.status==='pending').length;
+  const tab=el('adm-tab-dv');
+  const ex=tab.querySelector('.tab-badge'); if(ex) ex.remove();
+  if(pend>0){ const b=document.createElement('span'); b.className='tab-badge'; b.textContent=pend; tab.appendChild(b); }
+  const list=el('adm-dv-list');
+  if(!dvs.length){ list.innerHTML=`<div class="empty"><div class="empty-icon">💬</div><p>Nenhuma dúvida encontrada.</p></div>`; return; }
+  list.innerHTML=dvs.map(d=>`
+    <div class="duvida-card">
+      <div class="duvida-head">
+        <div>
+          <strong style="font-size:0.9rem;">${esc(d.name)}</strong>
+          <span class="text-xs text-muted" style="margin-left:6px;">${esc(d.turma)}</span>
+          <span class="pill pill-purple" style="margin-left:6px;">${d.materia}</span>
+        </div>
+        <span class="pill ${d.status==='answered'?'pill-green':'pill-yellow'}">${d.status==='answered'?'✅ Respondida':'⏳ Pendente'}</span>
+      </div>
+      <div class="duvida-body">${esc(d.texto)}</div>
+      <div class="duvida-meta">Enviada em ${d.date}</div>
+      ${d.resposta?`<div class="duvida-resp"><div class="duvida-resp-lbl">💬 Sua resposta · ${d.respDate}</div><div class="duvida-resp-txt">${esc(d.resposta)}</div></div>`:''}
+      ${d.status==='pending'?`<button class="btn btn-primary btn-xs" style="margin-top:10px;" onclick="showReply(${d.id})">💬 Responder</button>`:`<button class="btn btn-outline btn-xs" style="margin-top:10px;" onclick="showReply(${d.id})">✏️ Editar resposta</button>`}
+    </div>`).join('');
+}
+
+function showReply(id){
+  const d=DB.duvidas().find(x=>x.id===id); if(!d) return;
+  replyTarget=id;
+  el('m-reply-q').textContent=d.texto;
+  el('m-reply-txt').value=d.resposta||'';
+  openModal('m-reply');
+}
+async function confirmReply(){
+  const txt=v('m-reply-txt'); if(!txt.trim()){ alert('Digite uma resposta.'); return; }
+  showLoading('Enviando resposta...');
+  const dvs=DB.duvidas();
+  const idx=dvs.findIndex(x=>x.id===replyTarget); if(idx<0){ hideLoading(); return; }
+  dvs[idx].resposta=txt; dvs[idx].status='answered'; dvs[idx].respDate=new Date().toLocaleDateString('pt-BR');
+  await DB.setDuvidas(dvs);
+  hideLoading();
+  closeModal('m-reply'); replyTarget=null; renderAdminDuvidas();
+}
+
+// ---- CHARTS ----
+function renderCharts(){
+  const resp=DB.responses(), users=Object.values(DB.users());
+  el('adm-charts-wrap').innerHTML=[
+    ['adm-c1','📊 Distribuição de Pontuação'],['adm-c2','📈 Evolução Semanal'],
+    ['adm-c3','🎯 Pontos por Categoria'],['adm-c4','⏱️ Janelas de Foco — Top Alunos'],
+    ['adm-c5','😰 Principais Distrações'],['adm-c6','🏅 Top 8 Alunos por XP'],
+  ].map(([id,t])=>`<div class="chart-card"><div class="chart-ttl">${t}</div><div class="chart-box"><canvas id="${id}"></canvas></div></div>`).join('');
+
+  setTimeout(()=>{
+    Object.values(admCharts).forEach(c=>{ try{c.destroy();}catch{} }); admCharts={};
+
+    // Distribution
+    const bkts=[0,0,0,0,0];
+    resp.forEach(r=>{ bkts[Math.min(Math.floor(r.total/20),4)]++; });
+    admCharts.c1=mkChart('adm-c1','bar',{labels:['0-20','21-40','41-60','61-80','81-100'],datasets:[{data:bkts,backgroundColor:['#ef4444','#f97316','#f59e0b','#10b981','#00d4ff'],borderRadius:6}]});
+
+    // Weekly avg
+    const wkMap={};
+    resp.forEach(r=>{ if(!wkMap[r.weekKey]) wkMap[r.weekKey]=[]; wkMap[r.weekKey].push(r.total); });
+    const wks=Object.keys(wkMap).sort();
+    admCharts.c2=mkChart('adm-c2','line',{labels:wks.map(w=>w.split('-')[1]),datasets:[{label:'Média',data:wks.map(w=>Math.round(wkMap[w].reduce((a,b)=>a+b,0)/wkMap[w].length)),borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.08)',tension:0.4,fill:true}]});
+
+    // Categories
+    const catAvgs=['sec1','sec2','sec3','sec4','sec5'].map((k,i)=>{
+      const mx=[20,20,30,20,10][i]; const vals=resp.map(r=>r[k]);
+      return vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length/mx*100):0;
+    });
+    admCharts.c3=mkChart('adm-c3','doughnut',{labels:['Planejamento','Ambiente','Foco','Rec.Ativa','Bem-estar'],datasets:[{data:catAvgs,backgroundColor:['#00d4ff','#7c3aed','#f59e0b','#10b981','#ef4444'],borderWidth:0}]},{plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}}});
+
+    // Focus top
+    const top8=users.sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,8);
+    const focD=top8.map(u=>{ const ur=resp.filter(r=>r.mat===u.matricula); return ur.length?Math.round(ur.reduce((a,b)=>a+b.sec3,0)/ur.length):0; });
+    admCharts.c4=mkChart('adm-c4','bar',{labels:top8.map(u=>u.name.split(' ')[0]),datasets:[{data:focD,backgroundColor:'#f59e0b',borderRadius:5}]},{scales:{y:{min:0,max:30}}});
+
+    // Distractions
+    const dm={};
+    resp.forEach(r=>(r.distractions||[]).forEach(d=>{ dm[d]=(dm[d]||0)+1; }));
+    const dlb={celular:'📱 Celular',familia:'👨‍👩‍👧 Família',sono:'😴 Sono',ansiedade:'😰 Ansiedade',nenhuma:'✅ Nenhuma'};
+    if(Object.keys(dm).length) admCharts.c5=mkChart('adm-c5','pie',{labels:Object.keys(dm).map(k=>dlb[k]||k),datasets:[{data:Object.values(dm),backgroundColor:['#ef4444','#f97316','#3b82f6','#8b5cf6','#10b981'],borderWidth:0}]},{plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10}}}}});
+
+    // Top students
+    const topS=[...users].sort((a,b)=>(b.xp||0)-(a.xp||0)).slice(0,8);
+    admCharts.c6=mkChart('adm-c6','bar',{labels:topS.map(u=>u.name.split(' ')[0]),datasets:[{data:topS.map(u=>u.xp||0),backgroundColor:'rgba(0,212,255,0.7)',borderColor:'#00d4ff',borderWidth:1.5,borderRadius:5}]},{indexAxis:'y'});
+  },80);
+}
+
+function mkChart(id,type,data,extraOpts={}){
+  const c=document.getElementById(id); if(!c) return null;
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'#1e3050'},ticks:{color:'#64748b',font:{size:10}}},x:{grid:{color:'#1e3050'},ticks:{color:'#64748b',font:{size:10}}}}};
+  const merged=deepMerge(base,extraOpts);
+  if(type==='doughnut'||type==='pie'||type==='radar') { delete merged.scales; }
+  return new Chart(c.getContext('2d'),{type,data,options:merged});
+}
+
+function deepMerge(t,s){
+  const r={...t};
+  for(const k in s){ if(s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k])&&t[k]) r[k]=deepMerge(t[k],s[k]); else r[k]=s[k]; }
+  return r;
+}
+
+// ---- EXPORT ----
+function exportCSV(type){
+  let hd=[],rows=[];
+  const resp=DB.responses(), users=Object.values(DB.users()), dvs=DB.duvidas();
+  if(type==='students'){
+    hd=['Nome','Matrícula','Turma','XP','Fichas','Streak','Último envio','Semana atual'];
+    const wk=getWeekKey();
+    rows=users.map(u=>{ const ur=resp.filter(r=>r.mat===u.matricula); const last=ur[ur.length-1]; const sw=ur.some(r=>r.weekKey===wk)?'Sim':'Não'; return[u.name,u.matricula,u.turma||'-',u.xp||0,ur.length,u.streak||0,last?.date||'-',sw]; });
+  }else if(type==='responses'){
+    hd=['Nome','Matrícula','Turma','Semana','Data','Planej(20)','Amb(20)','Foco(30)','Rec(20)','Bem(10)','Total','Matéria','Horário','Obstáculo','Próxima semana'];
+    rows=resp.map(r=>[r.name,r.mat,r.turma,r.weekKey,r.date,r.sec1,r.sec2,r.sec3,r.sec4,r.sec5,r.total,r.q11,r.q10,r.q18,r.q19]);
+  }else if(type==='monthly'){
+    const wkMap={};
+    resp.forEach(r=>{ if(!wkMap[r.weekKey]) wkMap[r.weekKey]=[]; wkMap[r.weekKey].push(r.total); });
+    hd=['Semana','Nº Fichas','Média','Máx','Mín','80+ pts','<40 pts'];
+    rows=Object.entries(wkMap).sort().map(([w,vals])=>[w,vals.length,Math.round(vals.reduce((a,b)=>a+b,0)/vals.length),Math.max(...vals),Math.min(...vals),vals.filter(v=>v>=80).length,vals.filter(v=>v<40).length]);
+  }else if(type==='duvidas'){
+    hd=['Aluno','Matrícula','Turma','Matéria','Data envio','Dúvida','Status','Resposta','Data resposta'];
+    rows=dvs.map(d=>[d.name,d.mat,d.turma,d.materia,d.date,d.texto,d.status==='answered'?'Respondida':'Pendente',d.resposta||'-',d.respDate||'-']);
+  }
+  const csv=[hd.join(','),...rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(','))].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`neuroestudo_${type}_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ============================================================
+//  UTILS
+// ============================================================
+function el(id){ return document.getElementById(id); }
+function v(id){ const e=el(id); return e?e.value:''; }
+function now(){ return new Date().toISOString(); }
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showErr(el,msg){ el.textContent=msg; el.style.display='block'; }
+
+// add spin animation
+const st=document.createElement('style');
+st.textContent='@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(st);
+
+// ============================================================
+//  INIT
+// ============================================================
+initApp();
+</script>
+</body>
+</html>
